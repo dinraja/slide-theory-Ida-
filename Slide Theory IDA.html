@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slide Theory</title>
+<style>
+:root{--bg:#121413;--s1:#1a1d1b;--s2:#232724;--bd:#2f3430;--tx:#e9ece8;--mu:#8e968f;--ac:#c6f432;--acx:#11160a;--r:10px;--font:"Inter","Geist",system-ui,-apple-system,"Segoe UI",sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#121413}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 var(--font);overflow-x:hidden}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:5;background:rgba(18,20,19,.92);border-bottom:1px solid var(--bd)}
+nav .wrap{display:flex;align-items:center;gap:18px;height:52px}
+.brand{font-weight:700;letter-spacing:.14em;font-size:13px;margin-right:auto}
+nav a,nav button.l{color:var(--mu);text-decoration:none;background:none;border:0;cursor:pointer;padding:8px 4px;font-size:14px}
+nav a:hover,nav button.l:hover{color:var(--tx)}
+.st{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:6px}.st i{width:7px;height:7px;border-radius:50%;background:var(--ac)}
+@media(max-width:700px){.st{display:none}nav .wrap{gap:10px}}
+.hero{padding:28px 0 12px;display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:0 0 8px;letter-spacing:-.02em}
+.hero p{color:var(--mu);margin:0;max-width:42ch}
+.btn{border:1px solid var(--bd);background:var(--s2);border-radius:8px;padding:9px 14px;cursor:pointer;min-height:40px;transition:background .15s,border-color .15s}
+.btn:hover{border-color:#4a524c}.btn.p{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:600}.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.game{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:32px;padding:16px 0 28px;align-items:start;justify-content:center}.game>div:first-child{width:100%;max-width:440px;margin:0 auto}
+@media(max-width:860px){.game{grid-template-columns:1fr}}
+.panel{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px}
+h2{font-size:14px;margin:0 0 10px;font-weight:600}
+.modes{display:flex;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:4px;margin-bottom:12px}
+.modes button{flex:1;background:none;border:0;border-radius:6px;padding:8px;cursor:pointer;color:var(--mu)}
+.modes button[aria-pressed=true]{background:var(--s2);color:var(--tx);box-shadow:inset 0 0 0 1px var(--ac)}
+.opts{margin-bottom:12px;font-size:13px;color:var(--mu);display:none;gap:10px;align-items:center;flex-wrap:wrap}.opts.on{display:flex}
+select{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:6px 8px}
+.board{position:relative;width:100%;aspect-ratio:1;background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:6px;touch-action:manipulation}
+.in{position:relative;width:100%;height:100%}
+.t{position:absolute;width:25%;height:25%;padding:4px;left:0;top:0;transition:transform .16s cubic-bezier(.3,.8,.3,1)}
+.nm .t{transition:none}
+.t button{width:100%;height:100%;border-radius:8px;border:1px solid var(--bd);background:linear-gradient(180deg,#2b302c,#222623);font-size:clamp(20px,6vw,32px);font-weight:600;cursor:pointer;box-shadow:0 2px 0 #0d0f0e;background-size:400% 400%;position:relative}
+.t button:hover{border-color:#566057}.t button:active{transform:scale(.96)}
+.t.ok button{color:var(--ac);border-color:#4b5a22}
+.img .t button{color:transparent;font-size:0}.img .t button span{position:absolute;left:5px;top:3px;font-size:11px;color:#fff;text-shadow:0 0 3px #000;opacity:.8}
+.t.hint button{outline:2px solid var(--ac);outline-offset:1px;animation:pl .8s 2}
+@keyframes pl{50%{outline-offset:4px}}
+.t.bad button{animation:sh .22s}@keyframes sh{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.board.win .t button{border-color:var(--ac);color:var(--ac)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--mu)}
+.prog{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin:6px 0 4px}.prog div{height:100%;background:var(--ac);width:0;transition:width .2s}
+.msg{min-height:22px;font-size:13px;color:var(--mu);margin:10px 0 0}
+.ctl{margin-top:12px}
+.sec{padding:26px 0;border-top:1px solid var(--bd)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.mini{display:grid;grid-template-columns:repeat(4,38px);gap:3px}
+.mini div{height:38px;display:grid;place-items:center;border-radius:6px;background:var(--s2);font-size:13px;font-variant-numeric:tabular-nums}
+.mini .z{background:none;border:1px dashed var(--bd)}.mini small{font-size:10px;color:var(--ac);display:block;line-height:1}
+.mini div.w{flex-direction:column}
+code{background:var(--s2);padding:1px 6px;border-radius:4px;font-size:13px}
+.muted{color:var(--mu)}ol{padding-left:20px;margin:0}li{margin:4px 0}
+.thumb{width:44px;height:44px;border-radius:6px;border:1px solid var(--bd);background-size:cover}
+dialog{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:14px;padding:22px;max-width:92vw;width:380px}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+.set{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
+.big{font-size:34px;font-weight:700;color:var(--ac);font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.t{transition:none!important}*{animation:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+h1{text-transform:uppercase;font-weight:700;letter-spacing:-.01em}
+.btn{transition:background .15s,border-color .15s,transform .08s,box-shadow .15s}.btn:hover:not(:disabled){border-color:#566057;box-shadow:0 2px 10px rgba(0,0,0,.35)}.btn:active:not(:disabled){transform:translateY(1px) scale(.98)}.btn.p:hover:not(:disabled){background:#d6ff4a}
+.t button{transition:border-color .15s,box-shadow .15s,transform .08s,color .2s}.t button:hover{box-shadow:0 4px 10px rgba(0,0,0,.4),0 2px 0 #0d0f0e;transform:translateY(-1px)}
+.t.ok button{box-shadow:inset 0 -2px 0 #4b5a22,0 2px 0 #0d0f0e}
+nav a,nav button.l{border-bottom:2px solid transparent;transition:color .15s,border-color .15s}nav a.on{color:var(--tx);border-color:var(--ac)}
+.board.win .t button{animation:wv .55s both;animation-delay:calc(var(--i)*28ms)}@keyframes wv{40%{transform:scale(1.06)}}
+.board.shuf .t button{animation:sf .32s both;animation-delay:calc(var(--i)*14ms)}@keyframes sf{from{opacity:0;transform:scale(.88)}}
+.pop{animation:pp .3s}@keyframes pp{40%{color:var(--ac);transform:translateY(-2px)}}
+dialog[open]{animation:dg .22s cubic-bezier(.3,.8,.3,1)}dialog[open]::backdrop{animation:bk .22s}@keyframes dg{from{opacity:0;transform:translateY(10px) scale(.97)}}@keyframes bk{from{opacity:0}}
+.pv{display:grid;grid-template-columns:repeat(4,34px);gap:4px;padding:8px;border:1px solid var(--bd);border-radius:12px;background:var(--s1)}
+.pv i{height:34px;border-radius:6px;background:var(--s2);border:1px solid var(--bd);display:grid;place-items:center;font:600 13px var(--font);font-style:normal;color:var(--mu);animation:pi .4s both;animation-delay:calc(var(--i)*40ms + .1s)}
+.pv i.a{color:var(--ac);border-color:#4b5a22}.pv i.z{background:none;border-style:dashed}
+@keyframes pi{from{opacity:0;transform:scale(.7)}}
+#intro{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-content:center;justify-items:center;gap:10px;animation:io .35s 1.15s forwards}
+#intro .iw{font-weight:700;letter-spacing:.3em;font-size:clamp(20px,5vw,30px);animation:iu .55s both}
+#intro .it{color:var(--mu);font-size:14px;animation:iu .55s .3s both}
+.ig{display:grid;grid-template-columns:repeat(4,26px);gap:4px;margin-top:14px}.ig i{height:26px;border-radius:5px;background:var(--s2);border:1px solid var(--bd);animation:ii .35s both;animation-delay:calc(var(--i)*35ms + .45s)}.ig i.a{background:var(--ac);border-color:var(--ac)}
+@keyframes iu{from{opacity:0;transform:translateY(12px)}}@keyframes ii{from{opacity:0;transform:scale(.6)}}@keyframes io{to{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){#intro{display:none}}
+.t button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}.t button:focus-visible{outline:2px solid var(--ac);outline-offset:-3px;z-index:3}.t{will-change:transform}
+.hero{display:none!important}
+#scene{position:relative;height:210vh}.stk{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;--s:100px}
+.bgl{position:absolute;inset:-5%;background-image:linear-gradient(var(--bd) 1px,transparent 1px),linear-gradient(90deg,var(--bd) 1px,transparent 1px);background-size:64px 64px;opacity:.3;-webkit-mask-image:radial-gradient(ellipse at 50% 58%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 58%,#000 20%,transparent 75%);will-change:transform,opacity}
+.lt{position:absolute;left:0;top:0;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(198,244,50,.07),transparent 65%);pointer-events:none;will-change:transform}
+.tl{position:absolute;inset:0;transform-origin:50% 60%;--amp:1}
+.ot{position:absolute;left:0;top:0;width:var(--s);height:var(--s);padding:3px;will-change:transform,opacity}
+.ot .f{width:100%;height:100%;border-radius:8px;border:1px solid var(--bd);background:linear-gradient(180deg,#2b302c,#222623);display:grid;place-items:center;font:600 calc(var(--s)*.36)/1 var(--font);color:var(--mu);animation:fl var(--fd) ease-in-out infinite alternate,fi .7s var(--fo) both}
+.ot:nth-child(5n) .f{color:var(--ac);border-color:#4b5a22}
+@keyframes fl{to{transform:translateY(calc(var(--amp)*-9px)) rotate(calc(var(--amp)*3deg))}}@keyframes fi{from{opacity:0}}
+#ttl{position:absolute;left:0;right:0;top:38%;text-align:center;z-index:3;pointer-events:none;will-change:transform,opacity}
+#wm{font-size:clamp(40px,10.5vw,150px);font-weight:800;letter-spacing:.04em;line-height:1;margin:0;text-shadow:0 2px 30px #000}
+#wm span{display:inline-block;animation:lr .9s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i)*55ms + .15s)}#wm .sp{width:.3em}
+@keyframes lr{from{opacity:0;transform:translateY(40%)}55%{color:var(--ac)}}
+#tg{margin:18px 0 0;color:var(--mu);letter-spacing:.28em;font-size:clamp(11px,2.4vw,14px);animation:fi .8s 1s backwards}
+#cta{position:absolute;bottom:15%;left:0;right:0;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;z-index:4;animation:fi 1s 1.1s backwards}
+#cta .btn{text-decoration:none;display:inline-grid;align-items:center;letter-spacing:.06em;font-size:13px}#go2{transition:transform .2s,background .15s}
+#cue{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:12px;letter-spacing:.24em;color:var(--mu);animation:fi 1s 1.4s backwards}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .55s,transform .55s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--d)*70ms)}.rv.in{opacity:1;transform:none}
+#scene.rm{height:auto!important}#scene.rm .stk{position:relative;height:auto;min-height:62vh;display:grid;place-content:center}#scene.rm .tl,#scene.rm #cue,#scene.rm .lt{display:none}#scene.rm #ttl{position:static;transform:none!important}#scene.rm #cta{position:static;margin-top:24px}
+@media(prefers-reduced-motion:reduce){#scene{height:auto}.stk{position:relative;min-height:62vh;display:grid;place-content:center}.tl,#cue,.lt{display:none}#ttl{position:static}#cta{position:static;margin-top:24px}.rv{opacity:1;transform:none}}
+/* polish: board size, aligned colour-coded controls, tinted tiles, cards */
+.board{box-shadow:0 18px 40px -18px #000,inset 0 0 0 1px rgba(255,255,255,.02)}
+.board:not(.img) .t.r0 button{color:#9fd8ff}.board:not(.img) .t.r1 button{color:#c4b3ff}.board:not(.img) .t.r2 button{color:#ffd08a}.board:not(.img) .t.r3 button{color:#9fe8b4}
+.board:not(.img) .t.ok button,.board.win:not(.img) .t button{color:var(--ac)}
+.board:not(.img) .t.r0 button{border-top-color:#2c5f7a}.board:not(.img) .t.r1 button{border-top-color:#54467f}.board:not(.img) .t.r2 button{border-top-color:#7a5a24}.board:not(.img) .t.r3 button{border-top-color:#2f6a40}
+.board:not(.img) .t.ok button{border-color:#4b5a22}
+.ctl{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px}
+.ctl .btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 6px;min-height:46px;font-weight:600;font-size:13px;white-space:nowrap;border-radius:10px}
+#bNew,#bReset{grid-column:span 3}#bUndo,#bHint,#bSolve{grid-column:span 2}
+#bUndo::before,#bHint::before,#bSolve::before,#bReset::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+#bReset{background:#232724;color:#d6dad5}
+#bUndo{background:rgba(90,170,255,.12);border-color:rgba(90,170,255,.38);color:#a9d6ff}
+#bHint{background:rgba(255,184,64,.12);border-color:rgba(255,184,64,.38);color:#ffd48f}
+#bSolve{background:rgba(160,120,255,.14);border-color:rgba(160,120,255,.42);color:#cdbbff}
+#bUndo:hover:not(:disabled){background:rgba(90,170,255,.2)}#bHint:hover:not(:disabled){background:rgba(255,184,64,.2)}#bSolve:hover:not(:disabled){background:rgba(160,120,255,.24)}
+.msg{margin:12px 0 0;padding:10px 12px;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:8px;color:var(--tx);min-height:42px;display:flex;align-items:center}
+.stats{gap:12px}.stat{padding:12px 14px;border-top:2px solid var(--ac)}.stats .stat:nth-child(2){border-top-color:#7cc7ff}.stats .stat:nth-child(3){border-top-color:#ffc266}
+.panel{border-radius:12px}#solverP{border-top:2px solid #b49cff}
+.sec.cols>div{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;border-top:2px solid var(--ac)}
+.sec.cols>div:nth-child(2){border-top-color:#7cc7ff}.sec.cols>div:nth-child(3){border-top-color:#ffc266}
+#how{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px 22px;margin-bottom:32px;border-top:2px solid #b49cff}
+.mini div{background:#2a2f2b}.mini small{color:#ffc266}
+@media(max-width:420px){.ctl{gap:6px}.ctl .btn{font-size:12px;padding:10px 4px}}
+/* intro hand-off: scene reveal starts as the intro fades; skipped when the intro doesn't play (.ni) */
+#scene:not(.ni) #wm span{animation-delay:calc(var(--i)*55ms + 1.05s)}#scene:not(.ni) #tg{animation-delay:1.9s}#scene:not(.ni) #cta{animation-delay:2s}#scene:not(.ni) #cue{animation-delay:2.2s}#scene:not(.ni) .ot .f{animation-delay:0s,calc(var(--fo) + 1s)}
+/* restrained palette: charcoal, off-white, lime */
+.img .t button{background-image:var(--img)}
+.board:not(.img) .t.r0 button,.board:not(.img) .t.r1 button,.board:not(.img) .t.r2 button,.board:not(.img) .t.r3 button{color:var(--tx);border-top-color:var(--bd)}
+.board:not(.img) .t.ok button,.board.win:not(.img) .t button{color:var(--ac)}
+#bUndo,#bHint,#bSolve{background:var(--s2);border-color:var(--bd);color:var(--tx)}#bHint{border-color:#4b5a22;color:var(--ac)}
+#bUndo:hover:not(:disabled),#bHint:hover:not(:disabled),#bSolve:hover:not(:disabled){background:#2b302c;border-color:#566057}
+.stats .stat:nth-child(2),.stats .stat:nth-child(3),.sec.cols>div:nth-child(2),.sec.cols>div:nth-child(3),#solverP,#how{border-top-color:var(--bd)}.mini small{color:var(--ac)}
+.pbb{display:inline-block;margin:0 0 10px;padding:3px 10px;border-radius:99px;background:rgba(198,244,50,.12);border:1px solid #4b5a22;color:var(--ac);font-size:12px;font-weight:600}.pbb:empty{display:none}
+#tlt{font-size:12px}
+@media(max-width:560px){nav .wrap{gap:8px;padding:0 12px}nav a,nav button.l{font-size:13px}.brand{font-size:11px;letter-spacing:.08em}.game{gap:20px}}
+@media(max-width:480px){.wrap{padding:0 14px}.stats{gap:8px}.stat b{font-size:19px}}
+@media(max-width:400px){nav a[href="#how"]{display:none}}
+</style></head><body><div id="intro" aria-hidden="true"><div class="iw">SLIDE THEORY</div><div class="it">Every move has a purpose.</div><div class="ig" id="ig"></div></div>
+<nav><div class="wrap"><span class="brand">SLIDE THEORY</span>
+<a href="#play">Play</a><a href="#challenges" id="navC">Challenges</a><a href="#how">How to Play</a><button class="l" id="navS">Settings</button>
+<span class="st"><i></i>Puzzle engine ready</span></div></nav>
+<section id="scene" aria-label="Introduction"><div class="stk" id="stk"><div class="bgl" id="bg"></div><div class="lt" id="lt"></div><div class="tl" id="tl" aria-hidden="true"></div>
+<div id="ttl"><h1 id="wm" aria-label="SLIDE THEORY">SLIDE THEORY</h1><p id="tg">EVERY MOVE HAS A PURPOSE.</p></div>
+<div id="cta"><a id="go2" class="btn p" href="#play">START PLAYING</a><a class="btn" href="#algo">EXPLORE THE ALGORITHM</a></div><div id="cue" aria-hidden="true">SCROLL TO EXPLORE ↓</div></div></section>
+<main class="wrap">
+<header class="hero"><div><h1>Think ahead.<br>Move with intent.</h1><p>A classic logic challenge, reimagined for curious minds.</p></div>
+<div class="row"><a id="go" class="btn p" href="#play" style="text-decoration:none;display:inline-grid;align-items:center">START PLAYING</a><a class="btn" href="#algo" style="text-decoration:none;display:inline-grid;align-items:center">EXPLORE THE ALGORITHM</a></div><div class="pv" id="pv" aria-hidden="true"></div></header>
+
+<section class="game" id="play" aria-label="Puzzle">
+<div>
+<div class="modes" role="group" aria-label="Game mode">
+<button data-m="classic" aria-pressed="true">Classic</button><button data-m="image" aria-pressed="false">Image</button><button data-m="challenge" aria-pressed="false" id="mC">Challenge</button></div>
+<div class="opts" id="oImage"><input type="file" id="file" accept="image/png,image/jpeg,image/webp" class="sr" aria-label="Choose image"><button class="btn" id="pick">Upload image</button><button class="btn" id="sample">Use sample</button><span class="thumb" id="thumb" title="Original image"></span><span>Preview of the original</span></div>
+<div class="opts" id="oChal"><label>Rule <select id="chal"><option value="moves">Solve in 120 moves</option><option value="time">Solve in 3 minutes</option><option value="daily">Daily puzzle</option></select></label><span id="chalNote"></span></div>
+<div class="board" id="board" role="grid" aria-label="Sliding puzzle board"><div class="in" id="in"></div></div>
+<div class="row ctl">
+<button class="btn p" id="bNew">New game</button><button class="btn" id="bReset">Reset</button><button class="btn" id="bUndo">Undo</button><button class="btn" id="bHint">Hint</button><button class="btn" id="bSolve">Solve</button></div>
+<p class="msg" id="msg" role="status" aria-live="polite">Slide tiles next to the gap. Arrow keys work too.</p>
+</div>
+<aside>
+<div class="stats"><div class="stat"><b id="sMoves">0</b><span>Moves</span></div><div class="stat"><b id="sTime">0:00</b><span>Time</span></div><div class="stat"><b id="sBest">–</b><span>Best time</span></div></div>
+<div class="panel" style="margin-bottom:12px"><h2>Progress</h2><div class="prog"><div id="prog"></div></div><span class="muted" id="progT">0 of 15 tiles in place</span><p class="muted" style="margin:8px 0 0;font-size:13px">Difficulty: <b id="dif" style="color:var(--tx)">Medium</b></p></div>
+<div class="panel" id="solverP"><h2>Solver</h2><p class="muted" id="solInfo" style="margin:0 0 8px;font-size:13px">Press Solve to run IDA* on the current board.</p>
+<div class="row"><button class="btn" id="bPause" disabled>Pause</button><button class="btn" id="bStop" disabled>Stop</button><button class="btn" id="bList" disabled>Show solution</button></div><div class="row" style="margin-top:8px"><button class="btn" id="bBack" disabled>Step back</button><button class="btn" id="bStep" disabled>Step forward</button></div><div class="prog" style="margin-top:10px"><div id="tlb"></div></div><span class="muted" id="tlt"></span><div id="solList" class="muted" style="font-size:13px;margin-top:8px;word-break:break-word"></div></div>
+</aside></section>
+
+<section class="sec cols" id="algo"><div><h2>Algorithm explorer</h2>
+<p class="muted" style="font-size:13px;margin-top:0">Each number is that tile's Manhattan distance from its goal square. The gap counts as zero.</p>
+<div class="mini" id="mini" aria-label="Manhattan distances"></div></div>
+<div><h2>Cost breakdown</h2><p style="margin:4px 0"><code>f(n) = g(n) + h(n)</code></p>
+<p class="muted" style="font-size:14px">g = moves made: <b id="xg" style="color:var(--tx)">0</b><br>h = total Manhattan distance: <b id="xh" style="color:var(--tx)">0</b><br>f = g + h: <b id="xf" style="color:var(--tx)">0</b></p>
+<p class="muted" style="font-size:13px" id="xEx"></p><p class="muted" style="font-size:13px">Why h is admissible: a tile needs at least one move per square of distance, and each move shifts one tile by one square, so h never overestimates. IDA* searches depth-first within successive f = g + h bounds. With this heuristic, its first solution is a shortest solution.</p></div>
+<div><h2>Last solve</h2><p class="muted" style="font-size:14px" id="xRes">No solve yet. h is an estimate that never overshoots; the real solution length can be larger.</p></div></section>
+
+<section class="sec cols" id="challenges2"><div><h2>Your statistics</h2><p class="muted" style="font-size:14px;line-height:1.8" id="statsT"></p><button class="btn" id="bRst">Reset statistics</button><p class="muted" style="font-size:12px">Stored only in this browser. There is no online leaderboard; that would need a server.</p></div>
+<div><h2>Challenge rules</h2><p class="muted" style="font-size:14px">Pick Challenge mode to set a move limit, a time limit, or play today's daily puzzle (the same board for everyone on a given date, generated locally). Using the solver or hints disqualifies a challenge.</p><p class="muted" style="font-size:14px" id="dailyT"></p></div></section>
+
+<section class="sec" id="how"><h2>How to play</h2><ol class="muted"><li>Click or tap a tile beside the gap to slide it in. Arrow keys slide the tile on the opposite side of the arrow into the gap.</li><li>Arrange tiles 1 to 15 in order with the gap in the bottom-right corner.</li><li>The timer starts on your first move. Undo takes back a move and its count.</li><li>Hint highlights a suggested tile. Solve runs IDA* and plays the answer back.</li></ol></section>
+</main>
+<dialog id="dlgS"><h2>Settings</h2>
+<div class="set"><label for="oSound">Move sounds</label><input type="checkbox" id="oSound"></div>
+<div class="set"><label for="oOk">Highlight correct tiles</label><input type="checkbox" id="oOk" checked></div>
+<div class="set"><label for="oMo">Reduce motion</label><input type="checkbox" id="oMo"></div>
+<div class="set"><label for="oDif">Shuffle difficulty</label><select id="oDif"><option value="25">Easy</option><option value="70" selected>Medium</option><option value="160">Hard</option></select></div>
+<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn p" id="cS">Done</button></div></dialog>
+<dialog id="dlgW" aria-labelledby="wH"><h2 id="wH">Puzzle solved</h2><span class="pbb" id="wB"></span><div class="big" id="wT">0:00</div><p class="muted" id="wM" style="margin:4px 0"></p><p class="muted" id="wBest" style="margin:0 0 14px;font-size:13px"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="wC">Close</button><button class="btn p" id="wN" autofocus>Play again</button></div></dialog>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),GOAL=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0];
+const man=b=>{let s=0;for(let i=0;i<16;i++){const v=b[i];if(v)s+=Math.abs((i>>2)-((v-1)>>2))+Math.abs((i&3)-((v-1)&3))}return s};
+const solved=b=>b.every((v,i)=>v===GOAL[i]);
+const solvable=b=>{let inv=0;for(let i=0;i<16;i++)for(let j=i+1;j<16;j++)if(b[i]&&b[j]&&b[i]>b[j])inv++;const r=4-(b.indexOf(0)>>2);return r%2?inv%2===0:inv%2===1};
+const nbrs=z=>{const r=[],y=z>>2,x=z&3;if(y>0)r.push(z-4);if(y<3)r.push(z+4);if(x>0)r.push(z-1);if(x<3)r.push(z+1);return r};
+const swap=(b,i)=>{const c=b.slice(),z=c.indexOf(0);c[z]=c[i];c[i]=0;return c};
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(n,rand=Math.random){let b=GOAL.slice(),last=-1;for(let k=0;k<n||solved(b);k++){const z=b.indexOf(0);let o=nbrs(z).filter(i=>i!==last);const i=o[Math.floor(rand()*o.length)];last=z;b=swap(b,i)}return b}
+/* IDA* runs in an isolated worker: depth-first iterations bound memory by path depth. */
+const IDA_WORKER_SOURCE=`"use strict";
+const GOAL=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0];
+const nbrs=z=>{const r=[],y=z>>2,x=z&3;if(y>0)r.push(z-4);if(y<3)r.push(z+4);if(x>0)r.push(z-1);if(x<3)r.push(z+1);return r};
+const man=b=>{let s=0;for(let i=0;i<16;i++){const v=b[i];if(v)s+=Math.abs((i>>2)-((v-1)>>2))+Math.abs((i&3)-((v-1)&3))}return s};
+const key=b=>String.fromCharCode(...b);
+const FOUND=-1,LIMIT=-2;
+const valid=b=>Array.isArray(b)&&b.length===16&&new Set(b).size===16&&b.every(v=>Number.isInteger(v)&&v>=0&&v<16);
+const solvable=b=>{let inv=0;for(let i=0;i<16;i++)for(let j=i+1;j<16;j++)if(b[i]&&b[j]&&b[i]>b[j])inv++;const r=4-(b.indexOf(0)>>2);return r%2?inv%2===0:inv%2===1};
+function solve(start,limits){const began=Date.now();if(!valid(start))return {type:"result",state:"invalid",expanded:0,elapsed:0};if(!solvable(start))return {type:"result",state:"unsolvable",expanded:0,elapsed:0};const board=start.slice(),moves=[],path=new Set([key(board)]);let expanded=0,bound=man(board),iteration=0,stop=null;
+const status=reason=>({type:"result",state:reason,expanded,elapsed:Date.now()-began,bound,iteration});
+const check=()=>{if(expanded>=limits.maxExpanded)return "budget";if(Date.now()-began>=limits.maxMs)return "timeout";return null};
+function dfs(g,z,previousBlank){const h=man(board),f=g+h;if(f>bound)return f;if(h===0)return FOUND;if(g>=limits.maxDepth)return LIMIT;
+expanded++;if(expanded>=limits.maxExpanded||(expanded&2047)===0){stop=check();postMessage({type:"progress",expanded,elapsed:Date.now()-began,bound,iteration})}if(stop)return LIMIT;
+let next=Infinity;for(const i of nbrs(z)){if(i===previousBlank)continue;const tile=board[i];board[z]=tile;board[i]=0;const k=key(board);if(!path.has(k)){path.add(k);moves.push(i);const r=dfs(g+1,i,z);if(r===FOUND)return FOUND;if(r===LIMIT){board[i]=tile;board[z]=0;return LIMIT}if(r<next)next=r;moves.pop();path.delete(k)}board[i]=tile;board[z]=0}return next}
+for(;;){iteration++;const r=dfs(0,board.indexOf(0),-1);if(r===FOUND)return {type:"result",state:"done",moves:moves.slice(),expanded,elapsed:Date.now()-began,bound,iteration};if(r===LIMIT)return status(stop||"depth");if(r===Infinity)return status("empty");bound=r;stop=check();postMessage({type:"progress",expanded,elapsed:Date.now()-began,bound,iteration});if(stop)return status(stop)}}
+self.onmessage=e=>{if(!e.data||e.data.type!=="solve")return;try{postMessage(solve(e.data.board,e.data.limits))}catch(error){postMessage({type:"error",message:error&&error.message?error.message:"Worker solver failed."})}};`;
+function verifyPath(start,moves){let b=start.slice();for(const i of moves){const z=b.indexOf(0);if(!Number.isInteger(i)||!nbrs(z).includes(i))return false;b=swap(b,i)}return solved(b)}
+/* state */
+const KEY="slidetheory.v1";
+let lastImg,t0=0;let S={mode:"classic",board:GOAL.slice(),start:GOAL.slice(),hist:[],moves:0,time:0,started:false,done:false,over:false,assisted:false,sol:null,playing:null,paused:false,job:null,img:null,imgUrl:null,last:-1,hintId:0,lastRes:null,soundOn:false,ok:true};
+let st=load();
+function load(){const d={started:0,completed:0,bestTime:null,bestMoves:null,totalTime:0,streak:0,dailyDone:""};try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&typeof r==="object"){for(const k in d){if(typeof r[k]===typeof d[k]||(d[k]===null&&(r[k]===null||typeof r[k]==="number")))d[k]=r[k]}}}catch(e){}return d}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const say=t=>{$("msg").textContent=t};
+/* tiles */
+const inEl=$("in"),tiles={};let lastTap={v:0,t:0};
+for(let v=1;v<=15;v++){const d=document.createElement("div");d.className="t r"+((v-1)>>2);const b=document.createElement("button");b.innerHTML="<span>"+v+"</span>";b.setAttribute("aria-label","Tile "+v);b.onclick=()=>{const n=performance.now();if(lastTap.v===v&&n-lastTap.t<140)return;lastTap={v,t:n};tryMove(S.board.indexOf(v),true)};d.appendChild(b);inEl.appendChild(d);tiles[v]=d}
+function render(){const bd=$("board");if(lastImg!==S.imgUrl){lastImg=S.imgUrl;bd.style.setProperty("--img",S.imgUrl?`url(${S.imgUrl})`:"none")}bd.classList.toggle("img",S.mode==="image");bd.classList.toggle("win",S.done);bd.classList.toggle("nm",$("oMo").checked);
+for(let v=1;v<=15;v++){const i=S.board.indexOf(v),t=tiles[v],b=t.firstChild;t.style.transform=`translate(${(i&3)*100}%,${(i>>2)*100}%)`;t.classList.toggle("ok",S.ok&&i===v-1&&!S.done||false);
+const z=S.board.indexOf(0),adj=nbrs(z).includes(i);b.tabIndex=adj&&!S.done&&!S.over?0:-1;b.setAttribute("aria-disabled",!adj);
+if(S.mode==="image"&&S.imgUrl){const g=v-1;b.style.backgroundPosition=`${(g&3)*100/3}% ${(g>>2)*100/3}%`}else{b.style.backgroundPosition=""}}
+const ok=S.board.filter((v,i)=>v&&v===i+1).length;$("prog").style.width=ok/15*100+"%";$("progT").textContent=ok+" of 15 tiles in place";
+$("sMoves").textContent=S.moves;$("sTime").textContent=fmt(S.time);$("sBest").textContent=st.bestTime==null?"–":fmt(st.bestTime);
+$("bUndo").disabled=!S.hist.length||S.done||S.over||!!S.playing;$("bHint").disabled=S.done||S.over;
+const h=man(S.board);$("xg").textContent=S.moves;$("xh").textContent=h;$("xf").textContent=S.moves+h;
+const mini=$("mini");mini.innerHTML="";let worst=null;S.board.forEach((v,i)=>{const d=document.createElement("div");if(!v)d.className="z";else{const dist=Math.abs((i>>2)-((v-1)>>2))+Math.abs((i&3)-((v-1)&3));d.className="w";d.innerHTML=v+"<small>"+dist+"</small>";if(!worst||dist>worst.dist)worst={v,i,dist}}mini.appendChild(d)});
+$("xEx").textContent=worst&&worst.dist?`Example: tile ${worst.v} is at row ${(worst.i>>2)+1}, column ${(worst.i&3)+1}. Its goal is row ${((worst.v-1)>>2)+1}, column ${((worst.v-1)&3)+1}. So |${(worst.i>>2)+1}-${((worst.v-1)>>2)+1}| + |${(worst.i&3)+1}-${((worst.v-1)&3)+1}| = ${worst.dist}.`:"Every tile is home: h = 0.";
+$("statsT").innerHTML=`Started: ${st.started} · Completed: ${st.completed}<br>Best time: ${st.bestTime==null?"–":fmt(st.bestTime)} · Best moves: ${st.bestMoves==null?"–":st.bestMoves}<br>Average time: ${st.completed?fmt(Math.round(st.totalTime/st.completed)):"–"}<br>Unassisted streak: ${st.streak}`;
+$("dailyT").textContent=st.dailyDone===today()?"Today's daily puzzle: completed.":"Today's daily puzzle: not completed yet.";
+const pl=!!S.playing;$("bPause").disabled=!pl;$("bStop").disabled=!pl;$("bPause").textContent=S.paused?"Resume":"Pause";$("bList").disabled=!S.sol;
+const so=S.sol,nd=so?so.done.length:0,nt=so?nd+so.moves.length:0;$("bStep").disabled=!so||!so.moves.length||S.done||S.over;$("bBack").disabled=!so||!nd||S.done||S.over;$("tlb").style.width=(nt?nd/nt*100:0)+"%";$("tlt").textContent=so?`Verified solution · move ${nd} of ${nt}`:"";
+$("bSolve").textContent=S.job?"Cancel search":"Solve"}
+const today=()=>new Date().toISOString().slice(0,10);
+/* audio */
+let ac;function beep(f,d){if(!S.soundOn)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);o.stop(ac.currentTime+d)}catch(e){}}
+/* timer: single interval */
+let timer=null;const stopTimer=()=>{clearInterval(timer);timer=null};
+function startTimer(){if(timer)return;t0=Date.now();timer=setInterval(()=>{if(S.done||S.over){stopTimer();return}S.time=Math.floor((Date.now()-t0)/1000);chk();render()},500)}
+const cfg=()=>S.mode==="challenge"?$("chal").value:null;
+function chk(){const c=cfg();if(!S.started||S.done||S.over)return;if(c==="time"&&S.time>=180)fail("Time is up. Press New game to try again.");if(c==="moves"&&S.moves>=120&&!solved(S.board))fail("Move limit reached. Press New game to try again.")}
+function fail(t){S.over=true;stopTimer();stopPlay();say(t);render()}
+/* moves */
+function tryMove(i,user){if(S.done||S.over)return false;const z=S.board.indexOf(0);if(!nbrs(z).includes(i)){if(user){const v=S.board[i];if(v){const t=tiles[v];t.classList.remove("bad");void t.offsetWidth;t.classList.add("bad");say("That tile isn't next to the gap.")}}return false}
+if(user&&S.playing)return false;
+if(user&&S.job){cancelJob();$("solInfo").textContent="Search cancelled because the board changed."}
+if(user){S.sol=null;$("solList").textContent=""}
+S.hist.push({b:S.board,last:S.last});S.last=z;S.board=swap(S.board,i);S.moves++;beep(user?320:260,.06);
+if(!S.started){S.started=true;st.started++;save();startTimer()}
+if(solved(S.board))win();else chk();render();return true}
+function win(){S.done=true;stopTimer();stopPlay();const c=cfg();let note="",pb="";if(S.started&&t0)S.time=Math.floor((Date.now()-t0)/1000);
+if(!S.assisted){const bt=st.bestTime,bm=st.bestMoves;pb=bt==null?"First result saved":(S.time<bt&&S.moves<bm)?"New best time and moves":S.time<bt?"New best time":S.moves<bm?"New best move count":"";st.completed++;st.totalTime+=S.time;if(st.bestTime==null||S.time<st.bestTime)st.bestTime=S.time;if(st.bestMoves==null||S.moves<st.bestMoves)st.bestMoves=S.moves;st.streak++;if(c==="daily")st.dailyDone=today();save()}else note=" Solver was used, so this isn't recorded.";
+beep(520,.3);$("wT").textContent=fmt(S.time);$("wM").textContent=S.moves+" moves."+note;$("wB").textContent=pb;$("wBest").textContent=st.bestTime==null?"":`Best: ${fmt(st.bestTime)} · ${st.bestMoves} moves`;say("Solved in "+S.moves+" moves.");render();setTimeout(()=>{if(!$("dlgW").open)$("dlgW").showModal()},350)}
+function undo(){if(!S.hist.length||S.done||S.over||S.playing)return;cancelJob();const h=S.hist.pop();S.board=h.b;S.last=h.last;S.moves--;S.sol=null;render();say("Move undone.")}
+function setup(board,keep){S.board=board.slice();S.start=board.slice();S.hist=[];S.moves=0;S.time=0;S.started=false;S.done=false;S.over=false;S.assisted=false;S.sol=null;S.last=-1;stopTimer();stopPlay();cancelJob();$("solList").textContent="";render()}
+function newGame(){if(S.started&&!S.done&&!S.over&&st.streak){st.streak=0;save()}
+const c=cfg();let b;if(c==="daily"){const r=rng(+today().replace(/-/g,""));b=shuffle(90,r)}else b=shuffle(+$("oDif").value);setup(b);S.mode==="challenge"&&chalNote();say(c==="daily"?"Daily puzzle loaded.":"New puzzle. Your first move starts the timer.")}
+function reset(){setup(S.start);say("Back to the starting arrangement.")}
+function chalNote(){const c=$("chal").value;$("chalNote").textContent=c==="moves"?"Finish within 120 moves. No solver or hints.":c==="time"?"Finish within 3:00. No solver or hints.":"Same board for everyone today. No solver or hints."}
+/* hints & solver */
+function hint(){if(S.done||S.over)return;if(cfg()){S.assisted=true}else S.assisted=S.assisted;
+let i,m;if(S.sol&&S.sol.moves.length){i=S.sol.moves[0];m="Next move from the computed solution."}else{const z=S.board.indexOf(0);let o=nbrs(z).filter(x=>x!==S.last),sc=o.map(x=>man(swap(S.board,x)));const mn=Math.min(...sc);const c=o.filter((x,k)=>sc[k]===mn);i=c[Math.floor(Math.random()*c.length)];m="Heuristic hint: this lowers the Manhattan distance, but isn't guaranteed optimal."}
+if(cfg())S.assisted=true;document.querySelectorAll(".t.hint").forEach(x=>x.classList.remove("hint"));const v=S.board[i],t=tiles[v];t.classList.add("hint");setTimeout(()=>t.classList.remove("hint"),1700);say("Try tile "+v+". "+m);S.assisted=S.assisted||false}
+function cancelJob(){if(!S.job)return;const job=S.job;S.job=null;try{job.worker.terminate()}catch(e){}try{URL.revokeObjectURL(job.url)}catch(e){}}
+function solve(){if(S.job){cancelJob();say("Search cancelled.");$("solInfo").textContent="Search cancelled.";render();return}
+if(S.done||S.over||S.playing)return;
+if(!solvable(S.board)){say("This arrangement can't be solved (parity check failed).");return}
+if(solved(S.board)){say("Already solved.");return}
+const origin=S.board.slice(),originKey=origin.join(),started=performance.now(),limits={maxExpanded:1500000,maxMs:15000,maxDepth:100};let url,worker;
+try{url=URL.createObjectURL(new Blob([IDA_WORKER_SOURCE],{type:"text/javascript"}));worker=new Worker(url)}catch(error){try{if(url)URL.revokeObjectURL(url)}catch(e){};$("solInfo").textContent="Unable to start the solver worker.";say("The browser could not start the solver.");render();return}
+S.assisted=true;const job=S.job={worker,url,originKey};$("solInfo").textContent="Finding an optimal solution with IDA*...";render();
+const close=()=>{if(S.job!==job)return false;S.job=null;try{worker.terminate()}catch(e){}try{URL.revokeObjectURL(url)}catch(e){}return true};
+const fail=(message,spoken)=>{if(!close())return;$("solInfo").textContent=message;say(spoken);render()};
+worker.onerror=()=>fail("Solver worker stopped unexpectedly. Please try again.","The solver stopped unexpectedly.");
+worker.onmessage=e=>{const r=e.data||{};if(S.job!==job)return;if(r.type==="progress"){ $("solInfo").textContent=`IDA*: ${r.expanded.toLocaleString()} states explored · bound ${r.bound} · ${Math.max(0,Math.round(r.elapsed/1000))}s`;return }
+if(r.type==="error"){fail("Solver error: "+(r.message||"unknown error"),"The solver encountered an error.");return}
+if(r.type!=="result")return;
+if(r.state!=="done"){const labels={budget:"Search safely stopped after reaching its state limit.",timeout:"Search safely stopped after 15 seconds.",depth:"Search safely stopped at its maximum solution depth.",empty:"No solution was found.",unsolvable:"This arrangement cannot be solved (parity check failed).",invalid:"This puzzle arrangement is invalid."};const definite=r.state==="unsolvable"||r.state==="invalid";fail((labels[r.state]||"Search safely stopped.")+(definite?"":" This does not mean the puzzle is unsolvable."),definite?labels[r.state]:"No solution found within the safe search limit.");return}
+if(!close())return;
+if(S.board.join()!==originKey||!Array.isArray(r.moves)||!verifyPath(origin,r.moves)){say("Solver result failed verification and was discarded.");$("solInfo").textContent="Result discarded: the board changed or the path was invalid.";render();return}
+S.sol={moves:r.moves.slice(),done:[]};S.lastRes={n:r.moves.length,e:r.expanded,opt:true,ms:Math.round(performance.now()-started)};
+$("solInfo").textContent=`Solution: ${r.moves.length} moves · optimal (IDA*).`;$("xRes").textContent=`Solution length ${r.moves.length} moves (optimal: IDA* with an admissible Manhattan heuristic). ${r.expanded.toLocaleString()} states explored in ${S.lastRes.ms} ms. Starting h was ${man(origin)}.`;say("Solution found. Playing it back.");render();play()};
+try{worker.postMessage({type:"solve",board:origin,limits})}catch(error){fail("Unable to send the puzzle to the solver.","The solver could not start.")}}
+function play(){if(!S.sol||S.playing)return;S.paused=false;S.playing=setInterval(()=>{if(S.paused)return;if(!S.sol||!S.sol.moves.length){stopPlay();return}const i=S.sol.moves[0];const z=S.board.indexOf(0);if(tryMove(i,false)){S.sol.moves.shift();S.sol.done.push({i,z})}else stopPlay()},320);render()}
+function stopPlay(){clearInterval(S.playing);S.playing=null;S.paused=false;render()}
+function list(){if(!S.sol)return;const b=S.board.slice();$("solList").textContent="Tiles to slide: "+S.sol.moves.map(i=>{return S.board[i]}).length?(()=>{let c=S.board.slice(),o=[];for(const i of S.sol.moves){o.push(c[i]);c=swap(c,i)}return "Tiles to slide: "+o.join(", ")})():""}
+/* modes & image */
+function mode(m){S.mode=m;document.querySelectorAll(".modes button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m));$("oImage").classList.toggle("on",m==="image");$("oChal").classList.toggle("on",m==="challenge");
+if(m==="image"&&!S.imgUrl)sampleImg();if(m==="challenge")chalNote();newGame()}
+function sampleImg(){const c=document.createElement("canvas");c.width=c.height=800;const x=c.getContext("2d"),g=x.createLinearGradient(0,0,800,800);g.addColorStop(0,"#1c2b1a");g.addColorStop(1,"#c6f432");x.fillStyle=g;x.fillRect(0,0,800,800);x.strokeStyle="rgba(0,0,0,.35)";x.lineWidth=14;for(let r=60;r<700;r+=90){x.beginPath();x.arc(400,400,r,0,7);x.stroke()}x.fillStyle="#121413";x.font="bold 150px sans-serif";x.textAlign="center";x.fillText("SLIDE",400,420);x.fillText("THEORY",400,560);setImg(c.toDataURL("image/jpeg",.85))}
+function setImg(u){S.imgUrl=u;$("thumb").style.backgroundImage=`url(${u})`}
+$("pick").onclick=()=>$("file").click();$("sample").onclick=()=>{sampleImg();render();say("Sample image selected.")};
+$("file").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;if(!/^image\/(png|jpeg|webp)$/.test(f.type)){say("Use a PNG, JPEG, or WebP image.");return}if(f.size>5*1048576){say("Image is over 5 MB. Choose a smaller file.");return}
+const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const c=document.createElement("canvas");c.width=c.height=800;const s=Math.min(im.width,im.height);c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,800,800);setImg(c.toDataURL("image/jpeg",.85));URL.revokeObjectURL(u);newGame();say("Image ready. Cropped to a centered square.")};im.onerror=()=>{URL.revokeObjectURL(u);say("That file couldn't be read as an image.")};im.src=u};
+/* wiring */
+document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>mode(b.dataset.m));
+$("chal").onchange=()=>{chalNote();newGame()};
+$("bNew").onclick=newGame;$("bReset").onclick=reset;$("bUndo").onclick=undo;$("bHint").onclick=hint;$("bSolve").onclick=solve;
+$("bPause").onclick=()=>{S.paused=!S.paused;say(S.paused?"Playback paused.":"Playback resumed.");render()};
+$("bStop").onclick=()=>{stopPlay();say("Playback stopped.")};$("bList").onclick=list;
+$("bStep").onclick=()=>{const so=S.sol;if(!so||!so.moves.length||S.done||S.over)return;if(S.playing)S.paused=true;const i=so.moves[0],z=S.board.indexOf(0);if(tryMove(i,false)){so.moves.shift();so.done.push({i,z})}render()};
+$("bBack").onclick=()=>{const so=S.sol;if(!so||!so.done.length||S.done||S.over||!S.hist.length)return;if(S.playing)S.paused=true;const d=so.done.pop(),h=S.hist.pop();S.board=h.b;S.last=h.last;S.moves--;so.moves.unshift(d.i);render()};
+$("wC").onclick=()=>$("dlgW").close();
+$("bRst").onclick=()=>{if(confirm("Reset all saved statistics?")){st=load();try{localStorage.removeItem(KEY)}catch(e){}st=load();render()}};
+$("navS").onclick=()=>$("dlgS").showModal();$("cS").onclick=()=>$("dlgS").close();$("wN").onclick=()=>{$("dlgW").close();newGame()};
+$("navC").onclick=e=>{e.preventDefault();mode("challenge");$("play").scrollIntoView()};
+$("oSound").onchange=e=>{S.soundOn=e.target.checked;beep(400,.08)};$("oOk").onchange=e=>{S.ok=e.target.checked;render()};$("oMo").onchange=render;
+$("oDif").onchange=()=>{$("dif").textContent=$("oDif").selectedOptions[0].text;newGame()};
+document.addEventListener("keydown",e=>{const m={ArrowUp:4,ArrowDown:-4,ArrowLeft:1,ArrowRight:-1}[e.key];if(!m||document.querySelector("dialog[open]")||/SELECT|INPUT/.test(e.target.tagName))return;const br=$("board").getBoundingClientRect();if(br.top<0||br.bottom>innerHeight)return;e.preventDefault();const z=S.board.indexOf(0),i=z+m;const ok=(m===1&&(z&3)<3)||(m===-1&&(z&3)>0)||(m===4&&z<12)||(m===-4&&z>3);if(ok)tryMove(i,true)});
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&S.playing&&!S.paused){S.paused=true;render()}});
+S.board=shuffle(70);S.start=S.board.slice();render();
+/* polish layer: intro, hero preview, motion hooks */
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cells=(el,pat)=>{el.innerHTML=pat.map((v,i)=>`<i style="--i:${i}" class="${v===0?'z':(v===16||v===5||v===11)?'a':''}">${el.id==='pv'&&v?v:''}</i>`).join('')};
+const pat=GOAL.map((v,i)=>[1,6,11,0,2,3,9,4,7,13,5,8,10,12,14,15][i]);
+cells($('pv'),pat);cells($('ig'),pat.map(v=>v?(v===5||v===11?16:v):0));
+const intro=$('intro');let seen=false;try{seen=sessionStorage.getItem('st.intro')==='1';sessionStorage.setItem('st.intro','1')}catch(e){}
+if(RM||seen){intro.remove();$('scene').classList.add('ni')}else{const rm=()=>intro.remove();intro.addEventListener('animationend',e=>{if(e.animationName==='io')rm()});setTimeout(rm,1900);intro.onclick=rm}
+document.querySelectorAll('#in .t').forEach((t,k)=>t.style.setProperty('--i',k));
+$('go').onclick=e=>{e.preventDefault();$('board').scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});setTimeout(()=>{const b=document.querySelector('#in .t button[tabindex="0"]');b&&b.focus({preventScroll:true})},RM?0:450)};
+const bd=$('board');let shT;const shuf=()=>{if(RM)return;bd.classList.add('shuf');clearTimeout(shT);shT=setTimeout(()=>bd.classList.remove('shuf'),500)};
+$('bNew').addEventListener('click',shuf);$('wN').addEventListener('click',shuf);
+new MutationObserver(()=>{if(bd.classList.contains('win'))bd.classList.remove('shuf')}).observe(bd,{attributes:true,attributeFilter:['class']});
+if(!RM)['sMoves','sBest','sTime'].forEach(id=>{const el=$(id);let prev=el.textContent;new MutationObserver(()=>{const n=el.textContent;if(n!==prev&&id!=='sTime'){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}prev=n}).observe(el,{childList:true,characterData:true,subtree:true})});
+const links=[...document.querySelectorAll('nav a')];const secs=['play','challenges2','how'].map(id=>$(id));
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const id=e.target.id==='challenges2'?'#challenges':'#'+e.target.id;links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')===id))}}),{rootMargin:'-45% 0px -50% 0px'}).observe&&secs.forEach(s=>s&&0);
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const id=e.target.id==='challenges2'?'#challenges':'#'+e.target.id;links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')===id))}}),{rootMargin:'-45% 0px -50% 0px'});secs.forEach(s=>s&&io.observe(s));
+$('algo').id='algo';
+try{(()=>{
+const sc=$('scene'),stk=$('stk'),wm=$('wm'),ttl=$('ttl'),tg=$('tg'),cta=$('cta'),cue=$('cue'),tl=$('tl'),lt=$('lt'),bgE=$('bg'),brand=document.querySelector('.brand'),g2=$('go2');
+wm.innerHTML=[...'SLIDE THEORY'].map((c,i)=>c===' '?'<span class="sp"> </span>':`<span aria-hidden="true" style="--i:${i}">${c}</span>`).join('');
+g2.onclick=e=>{e.preventDefault();$('go').click()};
+const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
+if(RM){sc.classList.add('rm');return}
+const SC=[[-.42,-.3,-18,.5],[-.3,-.38,12,.9],[.3,-.4,-10,.6],[.43,-.28,20,1],[-.45,.02,8,.7],[.44,.05,-14,.55],[-.36,.3,-22,1],[-.18,.4,10,.6],[.12,.42,-8,.9],[.36,.33,16,.5],[-.12,-.44,-6,.7],[.2,-.44,9,.8],[-.5,.2,14,.8],[.5,-.08,-20,.6],[0,.46,6,.5]];
+const tiles=SC.map((c,i)=>{const o=document.createElement('div');o.className='ot';o.innerHTML=`<div class="f" style="--fd:${4+i%4*1.3}s;--fo:${(.5+i*.06).toFixed(2)}s">${i+1}</div>`;tl.appendChild(o);return o});
+let W,H,s,cx,cy,mx=0,my=0,tx=0,ty=0,p=0,raf=0;
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),ez=t=>t*t*(3-2*t);
+const lay=()=>{W=innerWidth;H=innerHeight;s=Math.min(W*.84,H*.5,460)/4;cx=W/2;cy=H*.6;stk.style.setProperty('--s',s+'px')};
+function draw(){let em=0;const fade=1-ez(cl((p-.9)/.1));
+tiles.forEach((o,i)=>{const c=SC[i],d=c[3],e=ez(cl((p-.08-i*.014)/.55));em+=e;const gx=cx+((i&3)-1.5)*s,gy=cy+((i>>2)-1.5)*s,sx=cx+c[0]*W,sy=H*.5+c[1]*H,k=(1-e)*d*26;
+o.style.transform=`translate3d(${sx+(gx-sx)*e+mx*k-s/2}px,${sy+(gy-sy)*e+my*k-s/2}px,0) rotate(${c[2]*(1-e)+Math.sin(p*6+i)*3*(1-e)}deg) scale(${(.55+.45*d)*(1-e)+e})`;o.style.opacity=((.45+.4*d)*(1-e)+e)*fade});
+tl.style.setProperty('--amp',1-em/15);tl.style.transform=`perspective(900px) rotateX(${(1-ez(cl(p/.7)))*8}deg) scale(${1+ez(cl(p/.8))*.05})`;
+const tt=ez(cl(p/.7)),vis=v=>v<.02?'hidden':'visible';
+ttl.style.transform=`translate3d(${mx*5}px,${-.26*H*tt+my*3}px,0) scale(${1-tt*.72})`;ttl.style.opacity=1-ez(cl((p-.78)/.2));
+const a=1-cl(p/.22);tg.style.opacity=a;const b=1-cl(p/.2);cta.style.opacity=b;cta.style.visibility=vis(b);cue.style.opacity=1-cl(p/.1);
+bgE.style.opacity=.3+.7*ez(cl(p/.6));bgE.style.transform=`translate3d(${-mx*6}px,${-my*6}px,0) scale(${1+p*.1})`;
+lt.style.transform=`translate3d(${(fine?(mx+1)/2*W:W/2)-350}px,${(fine?(my+1)/2*H:H*.45)-350}px,0)`;
+if(brand)brand.style.opacity=ez(cl((p-.7)/.25))}
+function frame(){raf=0;const r=sc.getBoundingClientRect();p=cl(-r.top/Math.max(1,sc.offsetHeight-H));mx+=(tx-mx)*.08;my+=(ty-my)*.08;if(r.bottom>-50)draw();if(Math.abs(tx-mx)>.001||Math.abs(ty-my)>.001)raf=requestAnimationFrame(frame)}
+const kick=()=>{if(!raf)raf=requestAnimationFrame(frame)};
+const onMove=e=>{tx=e.clientX/W*2-1;ty=e.clientY/H*2-1;kick()},onRs=()=>{lay();kick()};
+addEventListener('scroll',kick,{passive:true});addEventListener('resize',onRs);if(fine)addEventListener('pointermove',onMove,{passive:true});
+if(fine){g2.addEventListener('pointermove',e=>{const r=g2.getBoundingClientRect();g2.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.25}px,${(e.clientY-r.top-r.height/2)*.35}px)`});g2.addEventListener('pointerleave',()=>g2.style.transform='')}
+addEventListener('pagehide',()=>{cancelAnimationFrame(raf);removeEventListener('scroll',kick);removeEventListener('resize',onRs);removeEventListener('pointermove',onMove)});
+lay();frame();
+const rv=[...document.querySelectorAll('.modes,#board,.game .ctl,.stats .stat,aside .panel')];rv.forEach((e,i)=>{e.classList.add('rv');e.style.setProperty('--d',i)});
+new IntersectionObserver(es=>es.forEach(x=>rv.forEach(e=>e.classList.toggle('in',x.isIntersecting))),{threshold:.12}).observe($('play'));
+})()}catch(err){const sc=$('scene');if(sc)sc.classList.add('rm');console.warn('Scene effects disabled',err)}
+})();
+</script></body></html>
